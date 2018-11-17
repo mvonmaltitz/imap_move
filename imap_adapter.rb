@@ -10,6 +10,14 @@ class ImapAdapter
     connection.select(box)
   end
 
+  def subscribe_box(box)
+    connection.subscribe(box)
+  end
+
+  def delete_box(box)
+    connection.delete(box)
+  end
+
   def select_or_create_box(box)
     begin
       select_box(box)
