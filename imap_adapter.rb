@@ -16,6 +16,7 @@ class ImapAdapter
 
   def delete_box(box)
     connection.delete(box)
+    reconnect
   end
 
   def select_or_create_box(box)
