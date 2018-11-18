@@ -69,8 +69,13 @@ class ImapAdapter
   end
 
   def disconnect
-    connection.close
+    connection.close unless connection.disconnected?()
     @connection = nil
+  end
+
+  def reconnect
+    disconnect
+    connection
   end
 
   private
