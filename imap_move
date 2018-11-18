@@ -10,7 +10,7 @@ log.level = Logger::INFO
 
 
 options = {}
-options[:config] = "config.yml"
+options[:config] = File.expand_path("../" + options[:config],  __FILE__ )
 OptionParser.new do |opts|
   opts.banner = "Usage: imap_move [options]"
 
@@ -25,7 +25,7 @@ OptionParser.new do |opts|
 end.parse!
 
 # load config
-AppConfig = YAML.load_file(File.expand_path("../" + options[:config],  __FILE__ ))
+AppConfig = YAML.load_file(options[:config])
 # Connect into servers
 conn_from = ImapAdapter.new(AppConfig['from'])
 conn_to   = ImapAdapter.new(AppConfig['to'])
