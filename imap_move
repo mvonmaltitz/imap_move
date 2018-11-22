@@ -55,7 +55,7 @@ AppConfig['boxes_to_sync'].each do |box_from, box_to|
 
     # if message exist just remove
     if messages_existing.include?(message_id)
-      log.info("Message ##{uid} exixsts in destination")
+      log.info("Message ##{uid} exists in destination")
       conn_from.delete_messages(uid)
       next
     end
