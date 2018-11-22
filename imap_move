@@ -10,7 +10,7 @@ log.level = Logger::INFO
 
 
 options = {}
-options[:config] = File.expand_path("../" + options[:config],  __FILE__ )
+options[:config] = File.expand_path("../config.yml",  __FILE__ )
 OptionParser.new do |opts|
   opts.banner = "Usage: imap_move [options]"
 
