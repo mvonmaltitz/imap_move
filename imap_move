@@ -33,7 +33,12 @@ conn_to   = ImapAdapter.new(AppConfig['to'])
 AppConfig['boxes_to_sync'].each do |box_from, box_to|
   # select box_from
   log.info("Selecting \"origin\" box: #{box_from}")
-  conn_from.select_box(box_from)
+  begin
+    conn_from.select_box(box_from)
+  rescue
+    puts "#{$!}"
+    next
+  end
   total_of_messages = conn_from.find_message_ids.size
 
 
