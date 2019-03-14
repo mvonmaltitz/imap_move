@@ -43,39 +43,41 @@ AppConfig['boxes_to_sync'].each do |box_from, box_to|
 
 
   log.info("There's #{total_of_messages} messages to move")
-  # select or create box_to
-  conn_to.select_or_create_box(box_to)
-  log.info("Selecting \"destination\" box: #{box_to}")
+  unless total_of_messages == 0
+    # select or create box_to
+    conn_to.select_or_create_box(box_to)
+    log.info("Selecting \"destination\" box: #{box_to}")
 
-  # find messages that exist in the destination
-  messages_existing = conn_to.find_message_ids
+    # find messages that exist in the destination
+    messages_existing = conn_to.find_message_ids
 
-  # a block to execute for each message
-  index = 0
-  conn_from.for_each_message do |message|
-    index += 1
-    uid = message.attr['UID']
-    message_id = message.attr['ENVELOPE'].message_id
-    log.info("processing message uid: ##{uid} (#{index}/#{total_of_messages})")
+    # a block to execute for each message
+    index = 0
+    conn_from.for_each_message do |message|
+      index += 1
+      uid = message.attr['UID']
+      message_id = message.attr['ENVELOPE'].message_id
+      log.info("processing message uid: ##{uid} (#{index}/#{total_of_messages})")
 
-    # if message exist just remove
-    if messages_existing.include?(message_id)
-      log.info("Message ##{uid} exists in destination")
+      # if message exist just remove
+      if messages_existing.include?(message_id)
+        log.info("Message ##{uid} exists in destination")
+        conn_from.delete_messages(uid)
+        next
+      end
+
+      # find message body from original server
+      conn_from.copy_message(uid, conn_to, box_to)
+      log.info("Message ##{uid} copied to destination")
+
+      # removed message that is copied
       conn_from.delete_messages(uid)
-      next
+      log.info("Deleted message ##{uid}")
     end
-
-    # find message body from original server
-    conn_from.copy_message(uid, conn_to, box_to)
-    log.info("Message ##{uid} copied to destination")
-
-    # removed message that is copied
-    conn_from.delete_messages(uid)
-    log.info("Deleted message ##{uid}")
+    conn_to.subscribe_box(box_to)
+    # remove all messages that is mark to remove
+    conn_from.expunge
   end
-  conn_to.subscribe_box(box_to)
-  # remove all messages that is mark to remove
-  conn_from.expunge
   total_of_messages = conn_from.find_message_ids.size
   if total_of_messages == 0 and options[:delete]
     log.info("All mails removed")
