@@ -13,6 +13,9 @@ class ImapAdapter
   def subscribe_box(box)
     connection.subscribe(box)
   end
+  def unsubscribe_box(box)
+    connection.unsubscribe(box)
+  end
 
   def delete_box(box)
     connection.delete(box)

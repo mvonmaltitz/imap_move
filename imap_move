@@ -36,6 +36,7 @@ AppConfig['boxes_to_sync'].each do |box_from, box_to|
   begin
     conn_from.select_box(box_from)
   rescue
+    conn_from.unsubscribe_box(box_from)
     puts "#{$!}"
     next
   end
@@ -82,6 +83,11 @@ AppConfig['boxes_to_sync'].each do |box_from, box_to|
   if total_of_messages == 0 and options[:delete]
     log.info("All mails removed")
     log.info("Deleting mailbox.")
+    begin
+    conn_from.unsubscribe_box(box_from)
+    rescue
+      puts "Not subscribed to #{box_from}"
+    end
     conn_from.delete_box(box_from)
   end
 end
